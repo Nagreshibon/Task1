@@ -23,15 +23,10 @@ int main()
 	Controller C(&E, &P); 
 	//P.Fill();
 	P.Link(&E);
-	P.Distribute(&E, 2000);
+	P.Distribute(&E, 4000);
+	P.Distribute(&E, 1000, true); //spawn more carnivores
 	
 	E.PrintToScreen();
-	//std::cout << "\n field 2,14 vec size: " << E.GetField(2, 14)->GetVectorSize();
-	/*
-	*/
-	//P.PrintToScreen(); 
-	
-    //std::cout << "Hello World!\n";
 
 	bool MainLoop = true; 
 	

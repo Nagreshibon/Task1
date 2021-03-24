@@ -21,6 +21,8 @@ public:
 
 	void Distribute(SimMap* InMap, unsigned int Num);
 
+	void Distribute(SimMap* InMap, unsigned int Num, bool IsCarnivore);
+
 	void Link(SimMap* InMap);
 
 	void PrintToScreen();

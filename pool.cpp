@@ -113,7 +113,7 @@ void AnimalPool::Distribute(SimMap* InMap, unsigned int Num)
 	auto gen = std::bind(std::uniform_int_distribution<>(0, InMap->GetX()*InMap->GetY()-1), std::default_random_engine());
 	auto bgen = std::bind(std::uniform_int_distribution<>(0, 1), std::default_random_engine());
 
-	std::random_device rd;
+	/*std::random_device rd;
 	std::mt19937::result_type seed = rd() ^ (
 		(std::mt19937::result_type)
 		std::chrono::duration_cast<std::chrono::seconds>(
@@ -125,42 +125,43 @@ void AnimalPool::Distribute(SimMap* InMap, unsigned int Num)
 			).count());
 
 	std::mt19937 gen2(seed);
-	std::uniform_int_distribution<unsigned> distrib(0, 1);
+	std::uniform_int_distribution<unsigned> distrib(0, 1);*/
 	
 	for (unsigned int i = 0; i < Num; i++)
 	{
 		unsigned int k = gen();
-		PoolStart[i].CurrentField = nullptr; 
+		//PoolStart[i].CurrentField = nullptr;
+		(next + i)->CurrentField = nullptr; 
 		
 		//PoolStart[i].Place(InMap->GetField(k));
 		
-		if (distrib(gen2) == 1)
+		if (bgen())
 		{
 			std::cout << "adding female "; 
-			PoolStart[i].Female = true;
+			(next + i)->Female = true;
 			nActiveFemales++; 
 		}
 		else
 		{
 			std::cout << "adding male ";
-			PoolStart[i].Female = false;
+			(next + i)->Female = false;
 			nActiveMales++;
 		}
 
-		if (distrib(gen2) == 1)
+		if (bgen())
 		{
 			std::cout << "adding carnivore ";
-			PoolStart[i].Carnivore = true;
+			(next + i)->Carnivore = true;
 			nActiveCarnivores++;
 		}
 		else
 		{
 			std::cout << "adding herbivore ";
-			PoolStart[i].Carnivore = false;
+			(next + i)->Carnivore = false;
 			nActiveHerbivores++;
 		}
 
-		InMap->GetField(k)->AddAnimalBlind(&PoolStart[i]);
+		InMap->GetField(k)->AddAnimalBlind(next+i);
 		
 		
 		//nInactive--; 
@@ -194,6 +195,86 @@ void AnimalPool::Distribute(SimMap* InMap, unsigned int Num)
 	next = next + Num; 
 	std::cout << "Carnivores: " << nActiveCarnivores << " Herbivores: " << nActiveHerbivores << " Females:" << nActiveFemales << " Males:" << nActiveMales << "\n";
 	
+}
+
+void AnimalPool::Distribute(SimMap* InMap, unsigned int Num, bool IsCarnivore)
+{
+	if (Num > nInactive)
+	{
+		std::cout << "allocation exceeding pool size";
+		return;
+	}
+
+	auto gen = std::bind(std::uniform_int_distribution<>(0, InMap->GetX() * InMap->GetY() - 1), std::default_random_engine());
+	auto bgen = std::bind(std::uniform_int_distribution<>(0, 1), std::default_random_engine());
+
+	for (unsigned int i = 0; i < Num; i++)
+	{
+		unsigned int k = gen();
+		(next + i)->CurrentField = nullptr;
+
+		//PoolStart[i].Place(InMap->GetField(k));
+
+		if (bgen())
+		{
+			std::cout << "adding female ";
+			(next + i)->Female = true;
+			nActiveFemales++;
+		}
+		else
+		{
+			std::cout << "adding male ";
+			(next + i)->Female = false;
+			nActiveMales++;
+		}
+
+		if (IsCarnivore)
+		{
+			std::cout << "adding carnivore ";
+			(next + i)->Carnivore = true;
+			nActiveCarnivores++;
+		}
+		else
+		{
+			std::cout << "adding herbivore ";
+			(next + i)->Carnivore = false;
+			nActiveHerbivores++;
+		}
+
+		InMap->GetField(k)->AddAnimalBlind(next+i);
+
+
+		//nInactive--; 
+		//
+		////if(PoolStart[i].bIsFemale())
+		//if(bgen() == 1)
+		//{
+		//	PoolStart[i].Female = true; 
+		//	nActiveFemales++;
+		//}
+		//else
+		//{
+		//	PoolStart[i].Female = false; 
+		//	nActiveMales++;
+		//}
+
+		//if(bgen() == 1)
+		//{
+		//	PoolStart[i].Carnivore = true; 
+		//	nActiveCarnivores++;
+		//}
+		//else
+		//{
+		//	PoolStart[i].Carnivore = false;
+		//	nActiveHerbivores++;
+		//}
+		//std::cout << "placing animal: " << PoolStart[i].GetID() << " at: " << k << "\n"; 
+	}
+	//nInactive = 0;
+	nInactive = nInactive - Num;
+	next = next + Num;
+	std::cout << "Carnivores: " << nActiveCarnivores << " Herbivores: " << nActiveHerbivores << " Females:" << nActiveFemales << " Males:" << nActiveMales << "\n";
+
 }
 
 void AnimalPool::Link(SimMap* InMap)
