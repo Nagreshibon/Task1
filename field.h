@@ -18,6 +18,7 @@ public:
 	void AddAnimalBlind(Animal* inAnimal);
 
 	bool RemoveAnimal(Animal* inAnimal);
+	void RemoveAnimalAtIndex(unsigned int Index); 
 
 	SimMap* GetCurrentMap();
 	unsigned int GetCurrentXSize();
@@ -29,6 +30,12 @@ public:
 
 	Animal* GetAnimal(unsigned int idx);
 
+	void SetIndex(unsigned int idx) { Index = idx; };
+	unsigned int GetIndex() { return Index; }
+
+
+	//unsigned int IndexOffset = 0;
+	
 	void TurnReset();
 	void ProcessHusbandry(AnimalPool* inPool);
 	void ProcessPredation(AnimalPool* inPool);
@@ -44,12 +51,14 @@ private:
 	static unsigned int IDGen;
 
 	const unsigned int ID;
+	unsigned int Index; 
 
 	unsigned int MHerbivoreCount = 0;
 	unsigned int FHerbivoreCount = 0;
 	unsigned int MCarnivoreCount = 0;
 	unsigned int FCarnivoreCount = 0;
 	
+	SimMap* CurrentMap;
+	
 	std::vector<Animal*> AnimalVector;
-	SimMap* CurrentMap; 
 };

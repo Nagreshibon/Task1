@@ -20,7 +20,7 @@ public:
 	float Tick(float DeltaTime);
 	float TickTimer = 0.f;
 	float TickInterval = 0.5f;
-	void ProcessTurn();
+	void ProcessTurn(float DeltaTime);
 
 private:
 	bool bTickActive = true; 
@@ -29,7 +29,9 @@ private:
 	SimMap* Map;
 
 	float vOffset = 0;
-	float hOffset = 0; 
+	float hOffset = 0;
+
+	unsigned int CurrentStage = 0; 
 	
 	unsigned int nScreenWidth = 120;
 	unsigned int nScreenHeight = 40;

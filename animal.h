@@ -18,7 +18,11 @@ class Animal
 
 		void RandomMove();
 		void Place(Field* inField);
-		void Kill(); 
+		void Kill();
+
+		void MarkForMovement(); 
+		void MarkForCollection();
+		//void MarkForCollection(unsigned int inIndex);
 	
 		const unsigned int GetID() { return ID; }
 		const bool bIsCarnivore() { return Carnivore; }
@@ -28,14 +32,13 @@ class Animal
 		AnimalPool* GetPool() { return Pool; }
 
 	private:
-		static unsigned int IDGen;
-	
-		const unsigned int ID;
-		bool Carnivore;
-		bool Female;
-		unsigned int FedTimer = 3;
-		Field* CurrentField;
-		AnimalPool* Pool;
-		bool bHasMoved = false; 
+		Field* CurrentField; //8 bytes
+		AnimalPool* Pool; //8 bytes
+		static unsigned int IDGen; //4 bytes
+		unsigned int ID; //4 bytes
+		unsigned int FedTimer = 3; //4 bytes
+		bool bHasMoved = false; //1 byte
+		bool Carnivore; //1 byte
+		bool Female; //1 byte
 
 	};

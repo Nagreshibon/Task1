@@ -87,7 +87,6 @@ bool Field::RemoveAnimal(Animal* inAnimal)
 		AnimalVector.erase(g); 
 		//std::cout << "e ";
 
-		inAnimal->CurrentField = nullptr;
 		inAnimal->GetPool()->modInactive(1);
 				
 		if (inAnimal->bIsFemale())
@@ -113,6 +112,8 @@ bool Field::RemoveAnimal(Animal* inAnimal)
 			inAnimal->GetPool()->modActiveHerbivores(-1);
 			MHerbivoreCount--;
 		}
+
+		inAnimal->CurrentField = nullptr;
 		
 		return true;
 	}
@@ -145,6 +146,41 @@ bool Field::RemoveAnimal(Animal* inAnimal)
 	return false;
 }
 
+void Field::RemoveAnimalAtIndex(unsigned int inIndex)
+{
+	
+	Animal* inAnimal = *(AnimalVector.begin() + inIndex);
+	
+	inAnimal->CurrentField = nullptr;
+	inAnimal->GetPool()->modInactive(1);
+
+	if (inAnimal->bIsFemale())
+	{
+		if (inAnimal->bIsCarnivore())
+		{
+			inAnimal->GetPool()->modActiveCarnivores(-1);
+			FCarnivoreCount--;
+		}
+		else
+		{
+			inAnimal->GetPool()->modActiveHerbivores(-1);
+			FHerbivoreCount--;
+		}
+	}
+	else if (inAnimal->bIsCarnivore())
+	{
+		inAnimal->GetPool()->modActiveCarnivores(-1);
+		MCarnivoreCount--;
+	}
+	else
+	{
+		inAnimal->GetPool()->modActiveHerbivores(-1);
+		MHerbivoreCount--;
+	}
+
+	AnimalVector.erase(AnimalVector.begin() + inIndex);
+}
+
 void Field::PrintToScreen()
 {
 	std::cout << "|" << MHerbivoreCount << ":" << FHerbivoreCount << ":" << MCarnivoreCount << ":" << FCarnivoreCount << "|";
@@ -160,6 +196,7 @@ void Field::PrintVector()
 
 Animal* Field::GetAnimal(unsigned int idx)
 {
+	unsigned int count = GetVectorSize(); 
 	return AnimalVector[idx];
 }
 
@@ -169,6 +206,8 @@ void Field::TurnReset()
 	{
 		g->bHasMoved = false; 
 	}
+
+	//IndexOffset = 0; 
 }
 
 void Field::ProcessHusbandry(AnimalPool* inPool)
@@ -211,79 +250,126 @@ void Field::ProcessHusbandry(AnimalPool* inPool)
 		}
 	}
 	
-	std::cout << "Husbandry tally:" << num << " from field: " << X << ":" << Y << "\n";
+	//std::cout << "Husbandry tally:" << num << " from field: " << X << ":" << Y << "\n";
 }
 
 void Field::ProcessPredation(AnimalPool* inPool)
 {
-	if(MCarnivoreCount + FCarnivoreCount > 0)
+	if (MCarnivoreCount + FCarnivoreCount > 0)
 	{
-		std::vector<Animal*> PredationVector; 
-		
-		if(MHerbivoreCount + FHerbivoreCount > 0)
+
+		if (MHerbivoreCount + FHerbivoreCount > 0)
 		{
 			unsigned int k = 0;
 			unsigned int l = 0;
-			unsigned int eatlim = std::min(FCarnivoreCount + MCarnivoreCount, FHerbivoreCount+MHerbivoreCount);
-			std::cout << "eating " << eatlim << " herbivores\n";
-			
-			for (auto& g : AnimalVector)
+			unsigned int eatlim = std::min(FCarnivoreCount + MCarnivoreCount, FHerbivoreCount + MHerbivoreCount);
+
+			for(unsigned int i = 0; i!=AnimalVector.size(); i++)
 			{
-				if (k>= eatlim && l>=eatlim) return;
-				
-				if (g->bIsCarnivore())
+				if (k >= eatlim && l >= eatlim) return;
+
+				if (AnimalVector[i]->bIsCarnivore())
 				{
-					g->FedTimer--;
-					
+					AnimalVector[i]->FedTimer--;
+
 					if (k <= eatlim) //if less than >eatlim carnivores have eaten
 					{
-						g->FedTimer = 3;
+						AnimalVector[i]->FedTimer = 3;
 						k++;
 					}
 					else //if k=eatlim carnivores have already eaten
 					{
-						//g->FedTimer--;
-						if (g->FedTimer <= 0) PredationVector.push_back(g);
+						if (AnimalVector[i]->FedTimer <= 0) AnimalVector[i]->MarkForCollection();
 					}
 				}
-				else if (l<=eatlim) //if less than >eatlim herbivores have been eaten
+				else if (l <= eatlim) //if less than >eatlim herbivores have been eaten
 				{
-					PredationVector.push_back(g);
+					AnimalVector[i]->MarkForCollection();
 					l++;
 				}
 			}
+
 		}
 		else
 		{
-			unsigned int num_s = 0;
-			unsigned int num_d = 0;
-			for (auto &g : AnimalVector)
+			for (unsigned int i = 0; i != AnimalVector.size(); i++)
 			{
-				if(g->bIsCarnivore())
+				if (AnimalVector[i]->bIsCarnivore())
 				{
-					g->FedTimer--;
-					num_s++; 
-					if (g->FedTimer <= 0)
+					AnimalVector[i]->FedTimer--;
+					if (AnimalVector[i]->FedTimer <= 0)
 					{
-						PredationVector.push_back(g);
-						num_d++; 
+						AnimalVector[i]->MarkForCollection();
 					}
 				}
 			}
-			std::cout << "no herbivores to eat in field: " << X << ":" << Y << " , hungry predators: " << num_s << " dead:" << num_d << "\n";
 		}
 
-		for (auto p : PredationVector)
-		{
-			RemoveAnimal(p);
-		}
-		
 	}
 	else
 	{
 		std::cout << "no predators in field: " << X << ":" << Y << "\n";
 	}
 }
+
+//void Field::ProcessPredation(AnimalPool* inPool)
+//{
+//	if(MCarnivoreCount + FCarnivoreCount > 0)
+//	{
+//		
+//		if(MHerbivoreCount + FHerbivoreCount > 0)
+//		{
+//			unsigned int k = 0;
+//			unsigned int l = 0;
+//			unsigned int eatlim = std::min(FCarnivoreCount + MCarnivoreCount, FHerbivoreCount+MHerbivoreCount);
+//			
+//			for (auto& g : AnimalVector)
+//			{
+//				if (k >= eatlim && l >= eatlim) return;
+//
+//				if (g->bIsCarnivore())
+//				{
+//					g->FedTimer--;
+//
+//					if (k <= eatlim) //if less than >eatlim carnivores have eaten
+//					{
+//						g->FedTimer = 3;
+//						k++;
+//					}
+//					else //if k=eatlim carnivores have already eaten
+//					{
+//						if (g->FedTimer <= 0) g->MarkForCollection();
+//					}
+//				}
+//				else if (l <= eatlim) //if less than >eatlim herbivores have been eaten
+//				{
+//					g->MarkForCollection();
+//					l++;
+//				}
+//			}
+//			
+//		}
+//		else
+//		{
+//			for (auto &g : AnimalVector)
+//			{
+//				if(g->bIsCarnivore())
+//				{
+//					g->FedTimer--;
+//					if (g->FedTimer <= 0)
+//					{
+//						g->MarkForCollection();
+//					}
+//				}
+//			}
+//		}
+//		
+//	}
+//	else
+//	{
+//		std::cout << "no predators in field: " << X << ":" << Y << "\n";
+//	}
+//}
 
 void Field::ProcessMovement()
 {
@@ -298,14 +384,15 @@ void Field::ProcessMovement()
 		//std::cout << "aID: " << (*a)->GetID() << " bHM: " << (*a)->bHasMoved << "| ";
 		if (!(*a)->bHasMoved)
 		{
-			MoveVector.push_back(*a); 
+			(*a)->MarkForMovement(); 
+			//MoveVector.push_back(*a); 
 		}
 	}
 
-	for (auto m : MoveVector)
+	/*for (auto m : MoveVector)
 	{
 		m->RandomMove(); 
-	}
+	}*/
 	
 	//std::cout << "animals moved from field:" << X << ":" << Y << " - " << k << "\n";
 }

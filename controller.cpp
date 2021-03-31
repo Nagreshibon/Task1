@@ -59,7 +59,7 @@ void Controller::Display(float DeltaTime)
 		return; 
 	}
 	
-	swprintf_s(screen, 64, L"n=%d, P=%d, H=%d, FPS=%3.2f, T=%3.2f, D=%d", (Pool->GetSize() - Pool->GetInactive()), Pool->GetActiveCarnivores(), Pool->GetActiveHerbivores(), 1.0f / DeltaTime, TickTimer, Map->Dummy);
+	swprintf_s(screen, 64, L"n=%d, P=%d, H=%d, FPS=%3.2f, T=%3.2f, D=%d, S=%d", (Pool->GetSize() - Pool->GetInactive()), Pool->GetActiveCarnivores(), Pool->GetActiveHerbivores(), 1.0f / DeltaTime, TickTimer, Map->Dummy, CurrentStage);
 	
 	WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
 }
@@ -91,24 +91,44 @@ void Controller::ReadMap()
 
 float Controller::Tick(float DeltaTime)
 {
-	if (!bTickActive) return 0.f; 
+	if (!bTickActive) Display(DeltaTime); 
 	TickTimer += DeltaTime;
 	if (TickTimer > TickInterval)
 	{
 		TickTimer = 0.f;
-
-		//auto a1 = std::async(std::launch::async, [&] {ProcessTurn(); });
-		ProcessTurn(); 	
+		ProcessTurn(DeltaTime); 	
 	}
 	
 	return 0.0f;
 }
 
-void Controller::ProcessTurn()
+void Controller::ProcessTurn(float DeltaTime)
 {
+	CurrentStage = 0;
+	Display(DeltaTime);
 	Map->TurnReset();
+	
+	CurrentStage = 1;
+	Display(DeltaTime);
 	Map->ProcessPredation();
+	
+	CurrentStage = 2;
+	Display(DeltaTime);
+	Pool->ClearGarbage();
+	
+	CurrentStage = 3;
+	Display(DeltaTime);
 	Map->ProcessHusbandry();
+	
+	CurrentStage = 4;
+	Display(DeltaTime);
 	Map->ProcessMovement();
+	
+	CurrentStage = 5;
+	Display(DeltaTime);
+	Pool->ExecuteMovement();
+	
+	CurrentStage = 6;
+	Display(DeltaTime);
 
 }

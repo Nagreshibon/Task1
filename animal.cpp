@@ -1,4 +1,5 @@
 #include "animal.h"
+#include "pool.h"
 #include <algorithm>
 #include <functional>
 #include <chrono>
@@ -10,7 +11,6 @@ Animal::Animal(bool InCarnivore, bool InFemale) : ID(IDGen++)
 	Carnivore = InCarnivore;
 	Female = InFemale;
 	CurrentField = nullptr;
-	//Pool = nullptr;
 };
 
 Animal::Animal() : ID(IDGen++)
@@ -18,7 +18,6 @@ Animal::Animal() : ID(IDGen++)
 	Carnivore = false;
 	Female = false;
 	CurrentField = nullptr;
-	//Pool = nullptr;
 };
 
 Animal& Animal::operator=(const Animal& src)
@@ -29,7 +28,6 @@ Animal& Animal::operator=(const Animal& src)
 		Female = src.Female;
 		FedTimer = src.FedTimer;
 		CurrentField = src.CurrentField;
-		//Pool = src.Pool;
 
 	return *this;
 }
@@ -79,8 +77,6 @@ void Animal::RandomMove()
 		
 		auto gen = std::bind(std::uniform_int_distribution<int>(0, MoveVec.size()-1), std::default_random_engine(seed));
 		//std::cout << "MoveVec size: " << MoveVec.size() << " rand:" << distrib(gen) << "\n";
-
-		//int d1 = 0; int d2 = 0; int d3 = 0; int d4 = 0; int d6 = 0; int d7 = 0; int d8 = 0; int d9 = 0;
 		
 		
 		switch(MoveVec[gen()])
@@ -139,3 +135,18 @@ void Animal::Kill()
 	CurrentField = nullptr;
 	FedTimer = 2; 
 }
+
+void Animal::MarkForMovement()
+{
+	Pool->AddToMovement(this); 
+}
+
+void Animal::MarkForCollection()
+{
+	Pool->AddToGarbage(this);
+}
+
+//void Animal::MarkForCollection(unsigned int inIndex)
+//{
+//	Pool->AddToGarbage(this, inIndex);
+//}

@@ -280,6 +280,7 @@ void AnimalPool::Distribute(SimMap* InMap, unsigned int Num, bool IsCarnivore)
 void AnimalPool::Link(SimMap* InMap)
 {
 	InMap->SetPool(this);
+	Map = InMap; 
 }
 
 void AnimalPool::PrintToScreen()
@@ -292,6 +293,48 @@ void AnimalPool::PrintToScreen()
 	std::cout << "\n"; 
 	std::cout << "Carnivores: " << nActiveCarnivores << " Herbivores: " << nActiveHerbivores << " Females:" << nActiveFemales << " Males:" << nActiveMales << "\n";
 	std::cout << "nInactive:" << nInactive;
+}
+
+void AnimalPool::AddToMovement(Animal* inAnimal)
+{
+	MoveVector.push_back(inAnimal); 
+}
+
+void AnimalPool::ExecuteMovement()
+{
+	for (auto &m : MoveVector)
+	{
+		m->RandomMove();
+	}
+
+	MoveVector.clear(); 
+}
+
+void AnimalPool::AddToGarbage(Animal* inAnimal)
+{
+	GarbageVector_Pointers.push_back(inAnimal);
+}
+
+void AnimalPool::AddToGarbage(Animal* inAnimal, unsigned int inIndex)
+{
+	GarbageMap.emplace(inAnimal, inIndex); 
+}
+
+void AnimalPool::ClearGarbage()
+{
+
+	for(auto &GarbageIterator : GarbageVector_Pointers)
+	{
+		GarbageIterator->CurrentField->RemoveAnimal(GarbageIterator);
+	}
+	GarbageVector_Pointers.clear();
+
+	/*for (auto iter = GarbageMap.rbegin(); iter != GarbageMap.rend(); ++iter) 
+	{
+		iter->first->CurrentField->RemoveAnimalAtIndex(iter->second); 
+	}
+	GarbageMap.clear(); */
+	
 }
 
 void AnimalPool::modInactive(unsigned int k)

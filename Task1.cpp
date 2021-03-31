@@ -18,17 +18,26 @@ float fElapsedTime = 0.f;
 int main()
 {
 
-	SimMap E(50, 50);
-	AnimalPool P(1000000);
-	Controller C(&E, &P); 
+	SimMap Map(150, 150);
+	AnimalPool Pool(1000000);
+	Controller Controller(&Map, &Pool); 
 	//P.Fill();
-	P.Link(&E);
-	P.Distribute(&E, 4000);
-	P.Distribute(&E, 1000, true); //spawn more carnivores
-	
-	E.PrintToScreen();
+	Pool.Link(&Map);
+	//Pool.Distribute(&Map, 400);
+	Pool.Distribute(&Map, 40000, false);
+	Pool.Distribute(&Map, 10000, true); //spawn more carnivores
+	//Map.SpawnAnimal(1, 1, true, true, 4);
+	//Map.SpawnAnimal(1, 1, false, true, 4);
+	//Map.SpawnAnimal(1, 1, true, false, 4);
 
-	bool MainLoop = true; 
+	//Map.PrintToScreen();
+
+	//Map.ProcessPredation(); 
+	//Map.GetField(1, 1)->ProcessPredation(&Pool);
+	//Pool.ClearGarbage(); 
+
+	bool MainLoop = true;
+	//MainLoop = false; 
 	
 	while(MainLoop)
 	{
@@ -37,17 +46,17 @@ int main()
 		tp1 = tp2;
 		fElapsedTime = elapsedTime.count();
 		
-		if (GetAsyncKeyState((unsigned short)'Q') & 0x8000) C.ToggleTick();
+		if (GetAsyncKeyState((unsigned short)'Q') & 0x8000) Controller.ToggleTick();
 
-		if (GetAsyncKeyState((unsigned short)'W') & 0x8000) *(C.GetVOffset()) += -0.1;
-		if (GetAsyncKeyState((unsigned short)'S') & 0x8000) *(C.GetVOffset()) += 0.1;
-		if (GetAsyncKeyState((unsigned short)'A') & 0x8000) *(C.GetHOffset()) += -0.1;
-		if (GetAsyncKeyState((unsigned short)'D') & 0x8000) *(C.GetHOffset()) += 0.1;
+		if (GetAsyncKeyState((unsigned short)'W') & 0x8000) *(Controller.GetVOffset()) += -0.02;
+		if (GetAsyncKeyState((unsigned short)'S') & 0x8000) *(Controller.GetVOffset()) += 0.02;
+		if (GetAsyncKeyState((unsigned short)'A') & 0x8000) *(Controller.GetHOffset()) += -0.02;
+		if (GetAsyncKeyState((unsigned short)'D') & 0x8000) *(Controller.GetHOffset()) += 0.02;
 
 		if (GetAsyncKeyState((unsigned short)'E') & 0x8000) return 0;
 
-		C.Tick(fElapsedTime);		
-		C.Display(fElapsedTime);
+		Controller.Tick(fElapsedTime);
+		//Controller.Display(fElapsedTime);
 	}
 }
 

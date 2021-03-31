@@ -16,6 +16,7 @@ SimMap::SimMap(unsigned int SizeX, unsigned int SizeY)
 			//std::cout << j << "," << i << "," << j+i*SizeY << "|";
 			MapArr[x + (y * SizeX)].X = x;
 			MapArr[x + (y * SizeX)].Y = y;
+			MapArr[x + (y * SizeX)].SetIndex(x + (y * SizeX)); 
 			MapArr[x + (y * SizeX)].SetCurrentMap(this);
 			
 		}
@@ -31,6 +32,7 @@ SimMap::~SimMap()
 
 Field* SimMap::GetField(unsigned int InX, unsigned int InY)
 {
+	//std::cout << "returning field " << (MapArr + (InX + InY * X))->GetIndex() << "\n";
 	return (MapArr + (InX + InY * X));
 };
 
