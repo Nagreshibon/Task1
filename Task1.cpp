@@ -48,10 +48,10 @@ int main()
 		
 		if (GetAsyncKeyState((unsigned short)'Q') & 0x8000) Controller.ToggleTick();
 
-		if (GetAsyncKeyState((unsigned short)'W') & 0x8000) *(Controller.GetVOffset()) += -0.02;
-		if (GetAsyncKeyState((unsigned short)'S') & 0x8000) *(Controller.GetVOffset()) += 0.02;
-		if (GetAsyncKeyState((unsigned short)'A') & 0x8000) *(Controller.GetHOffset()) += -0.02;
-		if (GetAsyncKeyState((unsigned short)'D') & 0x8000) *(Controller.GetHOffset()) += 0.02;
+		if (GetAsyncKeyState((unsigned short)'W') & 0x8000) *(Controller.GetVOffset()) += -0.1;
+		if (GetAsyncKeyState((unsigned short)'S') & 0x8000) *(Controller.GetVOffset()) += 0.1;
+		if (GetAsyncKeyState((unsigned short)'A') & 0x8000) *(Controller.GetHOffset()) += -0.1;
+		if (GetAsyncKeyState((unsigned short)'D') & 0x8000) *(Controller.GetHOffset()) += 0.1;
 
 		if (GetAsyncKeyState((unsigned short)'E') & 0x8000) return 0;
 

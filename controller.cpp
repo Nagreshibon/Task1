@@ -91,7 +91,11 @@ void Controller::ReadMap()
 
 float Controller::Tick(float DeltaTime)
 {
-	if (!bTickActive) Display(DeltaTime); 
+	if (!bTickActive)
+	{
+		Display(DeltaTime);
+		return 0.f; 
+	}
 	TickTimer += DeltaTime;
 	if (TickTimer > TickInterval)
 	{
